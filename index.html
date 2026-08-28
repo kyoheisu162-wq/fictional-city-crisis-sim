@@ -1,53 +1,23 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#071019" />
-  <title>新港市 危機管理センター</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071019"><title>新港市 危機管理センター</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark">N</span><div><p>CRISIS OPERATIONS</p><h1>新港市 危機管理センター</h1></div></div>
-      <div class="clock-panel"><span class="status-dot"></span><span id="simulation-status">監視中</span><strong id="game-time">DAY 01 · 06:00</strong></div>
-      <div class="time-controls" aria-label="時間操作"><button id="pause-button" class="control-button" aria-pressed="false">▶ 開始</button><button class="speed-button active" data-speed="1">1×</button><button class="speed-button" data-speed="2">2×</button><button class="speed-button" data-speed="4">4×</button></div>
-    </header>
-
-    <section class="alert-strip"><span class="alert-label">訓練シナリオ</span><span>台風「白波」接近中 — 予想到達まで <strong id="arrival-time">18:00</strong></span><span class="alert-separator">/</span><span id="ticker-text">都市機能は平常レベルを維持しています</span></section>
-
-    <div class="dashboard-grid">
-      <aside class="sidebar left-sidebar">
-        <div class="section-heading"><span>01</span><h2>都市の概況</h2></div>
-        <div class="metric-list">
-          <article class="metric"><div class="metric-top"><span>人口</span><strong>128,400</strong></div><div class="bar"><i style="width:74%"></i></div><small>昼間人口を含む推定値</small></article>
-          <article class="metric"><div class="metric-top"><span>避難所</span><strong>0 / 12</strong></div><div class="bar muted"><i style="width:0%"></i></div><small>現在は未開設</small></article>
-          <article class="metric"><div class="metric-top"><span>道路網</span><strong id="road-status">100%</strong></div><div class="bar green"><i id="road-bar" style="width:100%"></i></div><small>通行可能な主要道路</small></article>
-        </div>
-        <div class="section-heading compact"><span>02</span><h2>重要施設</h2></div>
-        <ul class="facility-list" id="facility-list"></ul>
-      </aside>
-
-      <section class="map-panel" aria-label="新港市マップ">
-        <div class="map-toolbar"><span class="map-title">新港市 / 都市管制図</span><span class="map-legend"><i class="legend-road"></i>道路 <i class="legend-facility"></i>重要施設</span></div>
-        <div class="canvas-wrap"><canvas id="city-map" aria-label="新港市のグリッド地図"></canvas><div class="map-corner top-left">GRID 12×8</div><div class="map-corner top-right">NORTH ↑</div><div class="map-corner bottom-left">縮尺 1:28,000</div><div class="map-corner bottom-right" id="map-readout">座標を選択</div></div>
-        <div class="map-caption"><span><i class="pulse"></i>ライブシミュレーション</span><span>施設または地区をクリックして詳細を表示</span></div>
-      </section>
-
-      <aside class="sidebar right-sidebar">
-        <div class="section-heading"><span>03</span><h2>都市機能</h2></div>
-        <div class="system-grid" id="system-grid"></div>
-        <div class="section-heading compact"><span>04</span><h2>選択中の区域</h2></div>
-        <article class="district-card" id="district-card"><p class="eyebrow">CITY OVERVIEW</p><h3>新港市 全域</h3><p>地図上の地区または施設を選択すると、人口・リスク・接続状況を確認できます。</p><dl><div><dt>警戒レベル</dt><dd class="safe">LOW</dd></div><div><dt>優先対応</dt><dd>監視</dd></div></dl></article>
-      </aside>
-    </div>
-
-    <section class="feed-panel"><div class="section-heading"><span>05</span><h2>状況ログ</h2></div><ol id="event-feed" class="event-feed"></ol></section>
-  </main>
-  <script src="app.js"></script>
-</body>
-</html>
+<body><main class="app-shell">
+<header class="topbar"><div class="brand"><span class="brand-mark">N</span><div><p>CRISIS OPERATIONS</p><h1>新港市 危機管理センター</h1></div></div>
+<div class="clock-panel"><span class="status-dot"></span><span id="simulation-status">待機中</span><strong id="game-time">DAY 01 · 06:00</strong></div>
+<div class="time-controls"><button id="pause-button" class="control-button">▶ 開始</button><button class="speed-button active" data-speed="1">1×</button><button class="speed-button" data-speed="2">2×</button><button class="speed-button" data-speed="4">4×</button></div></header>
+<section class="alert-strip" id="alert-strip"><span class="alert-label" id="alert-level">訓練シナリオ</span><span id="headline">台風「白波」接近中</span><span class="alert-separator">/</span><span id="ticker-text">災害対策本部は待機中です</span></section>
+<div class="dashboard-grid"><aside class="sidebar"><div class="section-heading"><span>01</span><h2>都市の指標</h2></div><div class="metric-list" id="metric-list"></div><div class="section-heading compact"><span>02</span><h2>重要施設</h2></div><ul class="facility-list" id="facility-list"></ul></aside>
+<section class="map-panel"><div class="map-toolbar"><span class="map-title">新港市 / 都市管制図</span><span class="map-legend"><i class="legend-road"></i>道路 <i class="legend-facility"></i>重要施設</span></div><div class="canvas-wrap"><canvas id="city-map"></canvas><div class="map-corner top-left">GRID 12×8</div><div class="map-corner top-right">NORTH ↑</div><div class="map-corner bottom-left">縮尺 1:28,000</div><div class="map-corner bottom-right" id="map-readout">区域を選択</div></div><div class="map-caption"><span><i class="pulse"></i>ライブシミュレーション</span><span id="route-readout">道路網: 100% 通行可能</span></div></section>
+<aside class="sidebar"><div class="section-heading"><span>03</span><h2>都市機能</h2></div><div class="system-grid" id="system-grid"></div><div class="section-heading compact"><span>04</span><h2>選択中の対象</h2></div><article class="district-card" id="district-card"></article></aside></div>
+<section class="command-panel"><div class="section-heading"><span>05</span><h2>対策コマンド</h2><small>短期効果と長期コストを比較してください</small></div><div class="command-grid" id="command-grid"></div><div class="choice-row"><span>復旧優先度</span><button class="choice active" data-priority="power">電力</button><button class="choice" data-priority="water">水道</button><button class="choice" data-priority="medical">医療</button><em id="priority-note"></em></div><div class="choice-row"><span>公式発表</span><button class="choice active" data-comms="verify">検証して発表</button><button class="choice" data-comms="rapid">即時発表</button><button class="choice" data-comms="silent">発表を控える</button><em id="comms-note"></em></div></section>
+<div class="bottom-grid"><section class="feed-panel"><div class="section-heading"><span>06</span><h2>状況ログ</h2></div><ol class="event-feed" id="event-feed"></ol></section><section class="tools-panel"><div class="section-heading"><span>07</span><h2>シナリオと記録</h2></div><div class="tool-buttons"><button id="save-button">保存</button><button id="load-button">読込</button><button id="editor-button">JSONエディタ</button><button id="finish-button" class="danger-button">終了レポート</button></div><p id="save-status">ブラウザ内に保存できます。</p></section></div>
+</main>
+<dialog id="editor-dialog"><form method="dialog" class="dialog-card"><div class="dialog-header"><div><p class="eyebrow">SCENARIO JSON</p><h2>シナリオエディタ</h2></div><button class="close-button">×</button></div><p>災害の開始時刻・強度・予算を編集できます。適用するとシミュレーションを初期化します。</p><textarea id="scenario-json"></textarea><div class="dialog-actions"><button>閉じる</button><button type="button" id="apply-scenario" class="control-button">適用</button></div></form></dialog>
+<dialog id="report-dialog"><form method="dialog" class="dialog-card" id="report-content"></form></dialog>
+<script src="app.js"></script></body></html>
