@@ -12,6 +12,7 @@
     {id:"logistics",name:"東物流センター",icon:"▣",x:10.1,y:2.8,type:"物流",base:89,deps:["road","power"]}
   ];
   let config = {...base};
+  const city = () => Array.isArray(config.facilities) && config.facilities.length ? config.facilities : facilities;
   let state;
   const clamp = (value,min=0,max=100) => Math.max(min,Math.min(max,value));
   function clock() {
@@ -25,7 +26,7 @@
   }
   function start(next=base) {
     config = {...base,...next};
-    state = {minutes:config.start,running:false,speed:1,spent:0,safety:100,trust:72,rumor:7,flood:0,roads:100,teams:0,shelters:0,evacuated:0,priority:"power",comms:"verify",feed:[],selected:null,flags:{},health:Object.fromEntries(facilities.map(item=>[item.id,item.base]))};
+    state = {minutes:config.start,running:false,speed:1,spent:0,safety:100,trust:72,rumor:7,flood:0,roads:100,teams:0,shelters:0,evacuated:0,priority:"power",comms:"verify",feed:[],selected:null,flags:{},health:Object.fromEntries(city().map(item=>[item.id,item.base]))};
     event("SYSTEM","シナリオを初期化しました。災害対策本部は待機中。","info");
     render();
   }
@@ -64,8 +65,8 @@
     $("#alert-strip").classList.toggle("crisis",state.flood > 25);
     const metricRows = [["住民安全",state.safety,Math.round(128400*(100-state.safety)/100)+" 人が支援を必要とする可能性"],["インフラ",infrastructure,"重要施設・道路網の総合稼働率"],["市民信頼",state.trust,"デマ拡散指数 "+Math.round(state.rumor)+" / 100"],["予算",100-state.spent/config.budget,Math.round(config.budget-state.spent)+" / "+config.budget+" 対策ポイント"]];
     $("#metric-list").innerHTML = metricRows.map(row => '<article class="metric"><div class="metric-top"><span>'+row[0]+'</span><strong>'+Math.round(row[1])+(row[0]==="予算" ? "" : "%")+'</strong></div><div class="bar"><i style="width:'+clamp(row[1])+'%;background:'+(row[1]<40?"var(--danger)":row[1]<70?"var(--amber)":"var(--accent)")+'"></i></div><small>'+row[2]+'</small></article>').join("");
-    $("#facility-list").innerHTML = facilities.map(item => '<li data-facility="'+item.id+'"><span class="facility-name"><i class="facility-icon">'+item.icon+'</i>'+item.name+'</span><span class="facility-state '+stateClass(state.health[item.id])+'">'+Math.round(state.health[item.id])+'%</span></li>').join("");
-    $$("[data-facility]").forEach(element => element.onclick=()=>{state.selected=facilities.find(item=>item.id===element.dataset.facility);render();});
+    $("#facility-list").innerHTML = city().map(item => '<li data-facility="'+item.id+'"><span class="facility-name"><i class="facility-icon">'+item.icon+'</i>'+item.name+'</span><span class="facility-state '+stateClass(state.health[item.id])+'">'+Math.round(state.health[item.id])+'%</span></li>').join("");
+    $$("[data-facility]").forEach(element => element.onclick=()=>{state.selected=city().find(item=>item.id===element.dataset.facility);render();});
     const systems=[["電力",state.health.power],["水道",state.health.water],["通信",98-state.flood*.22],["医療",state.health.hospital],["物流",state.health.logistics],["道路",state.roads]];
     $("#system-grid").innerHTML=systems.map(row=>'<article class="system"><p>'+row[0]+'</p><strong>'+Math.round(row[1])+'%</strong><small class="'+stateClass(row[1])+'">'+(row[1]>=70?"NORMAL":row[1]>=40?"WATCH":"CRITICAL")+'</small></article>').join("");
     const selected=state.selected;
@@ -96,17 +97,17 @@
     ctx.strokeStyle=state.roads<55?"rgba(255,119,103,.63)":"rgba(106,208,191,.40)";
     for(let i=1;i<12;i+=2){ctx.beginPath();ctx.moveTo(i*cellWidth,0);ctx.lineTo(i*cellWidth,height);ctx.stroke();}
     for(let i=1;i<8;i+=2){ctx.beginPath();ctx.moveTo(0,i*cellHeight);ctx.lineTo(width,i*cellHeight);ctx.stroke();}
-    facilities.forEach(item=>{const value=state.health[item.id],x=item.x*cellWidth,y=item.y*cellHeight;ctx.beginPath();ctx.arc(x,y,state.selected===item?14:10,0,Math.PI*2);ctx.fillStyle=value<40?"#ff7767":value<70?"#f7c76a":"#5cf2c2";ctx.fill();ctx.fillStyle="#071019";ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="bold 12px sans-serif";ctx.fillText(item.icon,x,y+1);ctx.textAlign="left";ctx.textBaseline="alphabetic";});
+    city().forEach(item=>{const value=state.health[item.id],x=item.x*cellWidth,y=item.y*cellHeight;ctx.beginPath();ctx.arc(x,y,state.selected===item?14:10,0,Math.PI*2);ctx.fillStyle=value<40?"#ff7767":value<70?"#f7c76a":"#5cf2c2";ctx.fill();ctx.fillStyle="#071019";ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="bold 12px sans-serif";ctx.fillText(item.icon,x,y+1);ctx.textAlign="left";ctx.textBaseline="alphabetic";});
   }
   function resize(){const rect=map.getBoundingClientRect(),ratio=devicePixelRatio||1;map.width=rect.width*ratio;map.height=rect.height*ratio;ctx.setTransform(ratio,0,0,ratio,0,0);draw();}
   $("#pause-button").onclick=()=>{state.running=!state.running;event("SYSTEM",state.running?"時間進行を開始しました。":"時間進行を停止しました。","info");render();};
   $$(".speed-button").forEach(button=>button.onclick=()=>{state.speed=+button.dataset.speed;$$(".speed-button").forEach(item=>item.classList.toggle("active",item===button));});
   $$("[data-priority]").forEach(button=>button.onclick=()=>{state.priority=button.dataset.priority;$$("[data-priority]").forEach(item=>item.classList.toggle("active",item===button));$("#priority-note").textContent="選択した都市機能を優先復旧します。";});
   $$("[data-comms]").forEach(button=>button.onclick=()=>{state.comms=button.dataset.comms;$$("[data-comms]").forEach(item=>item.classList.toggle("active",item===button));$("#comms-note").textContent=button.dataset.comms==="verify"?"信頼を守りつつ情報を届けます。":button.dataset.comms==="rapid"?"情報は速いが、誤報は信頼を損ねます。":"デマが拡散しやすくなります。";});
-  map.onclick=event=>{const rect=map.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top,cellWidth=rect.width/12,cellHeight=rect.height/8;const hit=facilities.find(item=>Math.hypot(item.x*cellWidth-x,item.y*cellHeight-y)<25);if(hit){state.selected=hit;$("#map-readout").textContent="選択: "+hit.name;render();}};
+  map.onclick=event=>{const rect=map.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top,cellWidth=rect.width/12,cellHeight=rect.height/8;const hit=city().find(item=>Math.hypot(item.x*cellWidth-x,item.y*cellHeight-y)<25);if(hit){state.selected=hit;$("#map-readout").textContent="選択: "+hit.name;render();}};
   $("#save-button").onclick=()=>{localStorage.setItem("shinko-save",JSON.stringify({config,state}));$("#save-status").textContent="現在の状況を保存しました。";};
   $("#load-button").onclick=()=>{const saved=localStorage.getItem("shinko-save");if(!saved){$("#save-status").textContent="保存データがありません。";return;}const data=JSON.parse(saved);config=data.config;state=data.state;state.running=false;render();$("#save-status").textContent="保存データを読み込みました。";};
-  $("#editor-button").onclick=()=>{$("#scenario-json").value=JSON.stringify(config,null,2);$("#editor-dialog").showModal();};
+  $("#editor-button").onclick=()=>{$("#scenario-json").value=JSON.stringify({...config,facilities:city()},null,2);$("#editor-dialog").showModal();};
   $("#apply-scenario").onclick=()=>{try{const next=JSON.parse($("#scenario-json").value);if(!next.name||typeof next.flood!=="number")throw Error("name と flood が必要です");$("#editor-dialog").close();start(next);}catch(error){alert("JSONを適用できません: "+error.message);}};
   $("#finish-button").onclick=()=>{state.running=false;const infra=Math.round((state.health.power+state.health.water+state.health.hospital+state.roads)/4);const score=Math.round(state.safety*.4+infra*.28+state.trust*.18+(100-state.spent/config.budget)*.14);$("#report-content").innerHTML='<div class="dialog-header"><div><p class="eyebrow">AFTER ACTION REPORT</p><h2>'+config.name+' 終了報告</h2></div><button class="close-button">×</button></div><div class="report-score">'+score+'<small> / 100</small></div><p>'+(score>=75?"都市機能をおおむね維持し、被害を抑制しました。":score>=50?"復旧の基盤は確保しましたが、改善の余地があります。":"連鎖被害が都市機能に大きく影響しました。")+'</p><ul class="report-list"><li><span>住民安全</span><b>'+Math.round(state.safety)+'%</b></li><li><span>インフラ</span><b>'+infra+'%</b></li><li><span>市民信頼</span><b>'+Math.round(state.trust)+'%</b></li><li><span>残予算</span><b>'+Math.round(config.budget-state.spent)+'</b></li></ul>';$("#report-dialog").showModal();};
   window.addEventListener("resize",resize);start();resize();setInterval(tick,500);
